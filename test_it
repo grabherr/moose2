@@ -1,0 +1,7 @@
+echo Writing file to directory /output
+mkdir output
+cd output
+
+../Normalize -r ../sample_data/replicates -i ../sample_data/all_counts_9_norm_rpkm.txt -f 1 -l 9 -w ../sample_data/six_ref_genes
+
+# cd ..

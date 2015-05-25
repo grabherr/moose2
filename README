@@ -1,0 +1,18 @@
+How to build the executables (Linux and Mac OS only!!):
+
+type: make
+
+Input data
+The normalizer expects a matrix with the gene name as the first column, followed by the FPKM/RPKM values. A header (first line) must specify the sample names. Note that you can specify the first (-f) and last (-l) column that contain data, i.e. there can be additional information at the end of each line that will be carried through.
+
+Running the program:
+type: ./Normalize [options]
+
+Options:
+-i<string> : input file (the matrix with the values)
+-r<string> : replicates file (specifies which samples are replicates. the file contains one line for each set of replicates, first specifying a label, followed by the sample names belonging to this condition)
+-a<string> : average read counts per sample (def=0, specify for more accurate significance analysis)
+-col<string> : column that specifies the transcript length (def=0, provide the information about the transcript lengths, which allows for more accurate significance values)
+-w<string> : waypoint gene file (def="", known reference genes to be included in the analysis, only the first column of the file is interpreted as the gene name)
+-f<string> : first column with data (0-based) (def=1, the data starts here)
+-l<string> : last column with data (0-based) (def=0, the data ends here, the rest is ignored)
