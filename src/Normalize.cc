@@ -112,8 +112,8 @@ int main( int argc, char** argv )
 
 
   //=============================================
-  cmmd = "RefGeneSignificance -d distribution.txt -i ";
-  cmmd += fileName;
+  cmmd = "RefGeneSignificance -d distribution.txt -i normalized.out ";
+  //cmmd += fileName;
   cmmd += " -r ";
   cmmd += repName;
   cmmd += " -a ";
