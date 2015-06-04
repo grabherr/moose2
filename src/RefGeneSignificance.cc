@@ -246,8 +246,9 @@ int main( int argc, char** argv )
 	  if (lencol >0)
 	    len = parser.AsFloat(lencol)/1000;
 	  double reads = avg*len*total/1000000;
+	  
 	  corr = 1.-sqrt(reads)/reads;
-	  //cout << "reads " << reads << " avg " << avg << " len " << len << " corr: " << corr << endl;
+	  //cout << endl << "reads " << reads << " avg " << avg << " len " << len << " corr: " << corr << endl;
 	}
 	//cout << endl << "Testing " << val1.isize() << " " << val2.isize() << " " << n << " " << corr << endl;
 	cout << "\t" << Limit(EValueUp(cdf, val1, val2, corr)*n);
