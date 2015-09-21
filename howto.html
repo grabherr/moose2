@@ -31,7 +31,7 @@
     <br>
     MOOSE<sup>2</sup> requires two files:<br>
     <br>
-    <u>1. Expression values</u> (FPKM, RPKM): these need to be listed in
+    <u>1. Expression values</u>: these can either be raw read counts or normalized data, listed in
     a single file, one line per gene or transcript, e.g.:<br>
     <br>
     <font face="Courier New, Courier, monospace"><font face="Courier
@@ -51,12 +51,10 @@
     </font><br>
     Where the first line serves as a header naming the samples. If
     possible, also provide the transcript length in one of the columns,
-    e.g. the last one. Columns listing FPKM/RPKM values have to be
+    e.g. the last one. Columns listing expression values have to be
     contiguous.<br>
     <br>
-    For converting raw read counts into FPKM/RPKM values, we recommend
-    to run <a
-href="http://www.bioconductor.org/packages/release/bioc/html/DESeq2.html">DESeq2</a>.<br>
+   
     <br>
     <u>2. Replicate description</u>: this is a text file that specifies
     which samples are replicates, one line per replicate, preceded by an
@@ -85,12 +83,12 @@ href="http://www.bioconductor.org/packages/release/bioc/html/DESeq2.html">DESeq2
     <br>
     with the available arguments:<br>
     <br>
-    -i&lt;string&gt; : input file<br>
-    -r&lt;string&gt; : replicates file<br>
-    -a&lt;string&gt; : average read counts per sample (def=0)<br>
+    -i&lt;string&gt; : input file (all expression values) <br>
+    -r&lt;string&gt; : replicates file (one line per experiment, name followed by sample ids)<br>
+    -a&lt;string&gt; : average read counts per sample (def=0, needed for correcting significance for lowly expressed trsnacripts)<br>
     -col&lt;string&gt; : column that specifies the transcript length
-    (def=0)<br>
-    -w&lt;string&gt; : waypoint gene file (def=)<br>
+    (def=0, needed if RPKM/FPKM values are specified to estimate counts)<br>
+    -w&lt;string&gt; : waypoint gene file (def=, one gene per line)<br>
     -f&lt;string&gt; : first column with data (0-based) (def=1)<br>
     -l&lt;string&gt; : last column with data (0-based) (def=0)<br>
     <br>
@@ -101,7 +99,7 @@ href="http://www.bioconductor.org/packages/release/bioc/html/DESeq2.html">DESeq2
     <br>
     1. hmm_out: the set of genes assumed to be invariant in expression.<br>
     <br>
-    2. normalized.out: the normalized FPKM/RPKM values<br>
+    2. normalized.out: the normalized expression values<br>
     <br>
     3. distribution.txt: the distribution parameters and values<br>
     <br>
