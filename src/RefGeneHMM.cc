@@ -4,14 +4,11 @@
 #include <math.h>
 
 #define CRAZY_COST 99999999999.
-//#define REWARD 0.13
-//#define REWARD 0.12
-//#define REWARD 6.50
-
-//#define REWARD 7.0
 #define REWARD 4.
-//#define VIOLATION_PENALTY 5.0
 #define VIOLATION_PENALTY 5.0
+
+//#define REWARD 10.
+//#define VIOLATION_PENALTY 3.2
 
 class Node
 {
@@ -103,6 +100,9 @@ public:
       if (m_pos[i] < n.m_pos[i])
 	dist += VIOLATION_PENALTY;
     }
+
+    //if (m_reward > 100)
+    //cout << "Considering waypoint." << endl;
 
     double score = n.Score() + dist - m_reward /*+ m_flat * 0.1*/;
     //score -= log(m_dist+1.)/25.;
@@ -217,7 +217,8 @@ int main( int argc, char** argv )
     }
     if (bWay)
       tmp.SetWaypoint();
-
+    
+ 
     tmp.resize(last-first+1);
 
     double s = 0.;
@@ -228,6 +229,14 @@ int main( int argc, char** argv )
       if (tmp[i-first] < 1.)
 	bSkip = true;
     }
+
+    /*
+    if (bWay) {
+      if (bSkip) 
+	cout << "Skip waypoint (1) " << tmp.Name() << endl;
+      if (s < tmp.isize()) 
+	cout << "Skip waypoint (2) " << tmp.Name() << endl;
+	}*/
 
     if (s < tmp.isize() || bSkip)
       continue;

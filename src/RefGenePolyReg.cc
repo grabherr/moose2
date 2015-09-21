@@ -103,13 +103,33 @@ void Equation::Solve()
 
   m_b = -b0 -m_c*b3;
   m_a = -a0 - m_b*a2 - m_c* a3;
+  
+  
   cerr << "a=" << m_a << " b=" << m_b << " c=" << m_c << endl;
 }
 
 
 
 
+class Linear
+{
+public:
+  Linear() {}
 
+  double Value(const svec<double> & a, const svec<double> & avg) {
+    int i;
+    double sum = 0.;
+    double div = 0.;
+    for (i=0; i<a.isize(); i++) {
+      if (a[i] < 0.001 || avg[i] < 0.001)
+	continue;
+      sum += a[i]/avg[i];
+      div += 1.;
+    }
+    return sum/div;
+  }
+
+};
 
 
 
@@ -204,6 +224,14 @@ void PolyReg(double & a, double & b, double & c, const svec<double> & x, const s
   b = eq.b();
   c = eq.c();
 
+  if (b < 0 || b > 3.) {
+    a = 0.;
+    c = 0.;
+    Linear backoff;
+    b = backoff.Value(x, y);
+    cerr << "Fallback to a=" << a << " b=" << b << " c=" << c << endl;
+  }
+
   //a = (Sum(y)*Sum2(x)-Sum(x)*Sum(x,y))/(n*Sum2(x)-Sum(x)*Sum(x));
   //b = (n*Sum(x,y)-Sum(x)*Sum(y))/(n*Sum2(x)-Sum(x)*Sum(x));
   
@@ -228,12 +256,14 @@ int main( int argc, char** argv )
   commandArg<string> wayCmmd("-w","waypoint gene file");
   commandArg<int> firstCmmd("-f","first column with data (0-based)",1);
   commandArg<int> lastCmmd("-l","last column with data (0-based)",-1);
+  commandArg<bool> linCmmd("-linear","use linear regression",false);
   commandLineParser P(argc,argv);
   P.SetDescription("Prepares a list of normalized reference genes for RPKM normalization.");
   P.registerArg(fileCmmd);
   P.registerArg(wayCmmd);
   P.registerArg(firstCmmd);
   P.registerArg(lastCmmd);
+  P.registerArg(linCmmd);
   
   P.parse();
   
@@ -241,6 +271,7 @@ int main( int argc, char** argv )
   string wayName = P.GetStringValueFor(wayCmmd);
   int first =  P.GetIntValueFor(firstCmmd);
   int last =  P.GetIntValueFor(lastCmmd);
+  bool bLin =  P.GetBoolValueFor(linCmmd);
 
   Waypoints w(last-first+1);
 
@@ -285,14 +316,23 @@ int main( int argc, char** argv )
   }
 
   int ref = 6;
-  svec<double> a, b, c;
+  svec<double> a, b, c, l;
   a.resize(last-first+1);
   b.resize(last-first+1);
   c.resize(last-first+1);
+  l.resize(last-first+1);
 
- 
+  Linear lin;
   for (i=0; i<a.isize(); i++) {     
-    PolyReg(a[i], b[i], c[i], w.Get(i), avg);
+    l[i] = lin.Value(w.Get(i), avg);
+    if (!bLin) {
+      PolyReg(a[i], b[i], c[i], w.Get(i), avg);
+    } else {
+      a[i] = 0.;
+      b[i] = l[i];
+      c[i] = 0.;
+      cerr << "Using linear model a=" << a[i] << " b=" << b[i] << " c=" << c[i] << endl;
+    }
   }
   
  
@@ -302,7 +342,7 @@ int main( int argc, char** argv )
   parser.Open(fileName);
   parser.ParseLine();
   cout << parser.Line() << endl;
-
+  double bound = 1.;
   while (parser.ParseLine()) {
     if (parser.GetItemCount() == 0)
       continue;
@@ -311,7 +351,7 @@ int main( int argc, char** argv )
       double d = parser.AsFloat(i);
    
       double val;
-      if (d > 1.) {
+      if (d > bound) {
 	double x, y;
 	y = log(d);
  
@@ -346,7 +386,12 @@ int main( int argc, char** argv )
 	//val = x*d/y;
 	//cout << "1: " << d << endl;
       } else {
-	val = d;
+	// Backoff to linear
+	double bb = log(bound);
+	double vv = a[i-first]+b[i-first]*bb+c[i-first]*bb*bb;
+	vv = exp(vv);
+	val = d / bound * vv;
+	//cerr << endl << "Before: " << d << " after " << val << " vv: " << vv << endl;
       }
 
 

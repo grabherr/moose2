@@ -24,7 +24,7 @@ void AddFold(svec<double> & hist, svec<double> & val, double scale) {
       double f = Fold3(val[i], val[j])/scale;
       int index = (int)(f+hist.isize()/2+0.5);
       if (index < 0 || index >= hist.isize()) {
-	cout << "OUT OF RANGE: " << val[i] << " " << val[j] << " " << f << endl;
+	//cout << "OUT OF RANGE: " << val[i] << " " << val[j] << " " << f << endl;
       } else {
 	hist[index] += 1.;
       }
