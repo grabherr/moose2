@@ -13,19 +13,28 @@ int main( int argc, char** argv )
   commandArg<string> repCmmd("-r","replicate config file");
   commandArg<int> firstCmmd("-f","first column with data (0-based)",1);
   commandArg<int> lastCmmd("-l","last column with data (0-based)",-1);
+  commandArg<bool> countCmmd("-counts","process read COUNTS, not FPKMs",false);
+
+
   commandLineParser P(argc,argv);
   P.SetDescription("Computes a distribution based on FPKM values/replicates.");
   P.registerArg(fileCmmd);
   P.registerArg(repCmmd);
   P.registerArg(firstCmmd);
   P.registerArg(lastCmmd);
-  
+  P.registerArg(countCmmd);
+
   P.parse();
   
   string fileName = P.GetStringValueFor(fileCmmd);
   string repName = P.GetStringValueFor(repCmmd);
   int first =  P.GetIntValueFor(firstCmmd);
   int last =  P.GetIntValueFor(lastCmmd);
+  bool bCounts = P.GetBoolValueFor(countCmmd);
+
+  double thresh = 2.;
+  if (bCounts)
+    thresh = 20.;
 
   Replicates rep;
   rep.ReadConfig(repName);
@@ -43,7 +52,11 @@ int main( int argc, char** argv )
     rep.Configure(parser.AsString(i), i);
 
   svec<double> hist;
-  hist.resize(300);
+
+  //hist.resize(300);
+  //double range = 3.;
+
+  hist.resize(100);
   double range = 3.;
   double scale = range/(double)(hist.isize()/2);
 
@@ -66,7 +79,7 @@ int main( int argc, char** argv )
 	//cout << "Push " << c[j] << endl;
 	val.push_back(parser.AsFloat(c[j]));
       }
-      AddFold(hist, val, scale);
+      AddFold(hist, val, scale, thresh);
       val.clear();
     }
   }

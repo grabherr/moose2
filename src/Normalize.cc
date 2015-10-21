@@ -23,6 +23,7 @@ int main( int argc, char** argv )
 
   commandArg<string> fileCmmd("-i","input file");
   commandArg<string> repCmmd("-r","replicates file");
+  commandArg<bool> countCmmd("-counts","process read COUNTS, not FPKMs",false);
   commandArg<string> readsCmmd("-a","average read counts per sample", "0");
   commandArg<string> lenCmmd("-col","column that specifies the transcript length", "0");
   commandArg<string> wayCmmd("-w","waypoint gene file","");
@@ -35,6 +36,7 @@ int main( int argc, char** argv )
   P.SetDescription("Runs a pipeline to re-estimate FPKM/RPKM values.");
   P.registerArg(fileCmmd);
   P.registerArg(repCmmd);
+  P.registerArg(countCmmd);
   P.registerArg(readsCmmd);
   P.registerArg(lenCmmd);
   P.registerArg(wayCmmd);
@@ -50,6 +52,7 @@ int main( int argc, char** argv )
   string readCount = P.GetStringValueFor(readsCmmd);
   string first = P.GetStringValueFor(firstCmmd);
   string last = P.GetStringValueFor(lastCmmd);
+  bool bCounts = P.GetBoolValueFor(countCmmd);
 
   int i;
 
@@ -106,7 +109,8 @@ int main( int argc, char** argv )
   cmmd += first;
   cmmd += " -l ";
   cmmd += last;
-
+  if (bCounts)
+    cmmd += " -counts ";
   cmmd += " > distribution.txt";
   Run(exec_dir, cmmd);
 
@@ -120,6 +124,8 @@ int main( int argc, char** argv )
   cmmd += readCount;
   cmmd += " -l ";
   cmmd += col;
+  if (bCounts)
+    cmmd += " -counts ";
  
   cmmd += " > significance.txt";
   Run(exec_dir, cmmd);

@@ -116,6 +116,9 @@ int main( int argc, char** argv )
   commandArg<double> epsilonCmmd("-e","epsilon (Gauss)", 0.);
   commandArg<int> readsCmmd("-a","average read counts per sample", 0);
   commandArg<int> lenCmmd("-l","column that specifies the transcript length", -1);
+  commandArg<bool> countCmmd("-counts","process read COUNTS, not FPKMs",false);
+
+
   commandLineParser P(argc,argv);
   P.SetDescription("Computes sigificance for differential expression based on a Laplace/Normal distribution.");
   P.registerArg(fileCmmd);
@@ -125,7 +128,8 @@ int main( int argc, char** argv )
   P.registerArg(distCmmd);
   P.registerArg(readsCmmd);
   P.registerArg(lenCmmd);
-  
+  P.registerArg(countCmmd);
+
   P.parse();
   
   string fileName = P.GetStringValueFor(fileCmmd);
@@ -135,6 +139,7 @@ int main( int argc, char** argv )
   double epsilon = P.GetDoubleValueFor(epsilonCmmd);
   double total = P.GetIntValueFor(readsCmmd);
   int lencol = P.GetIntValueFor(lenCmmd);
+  bool bCounts = P.GetBoolValueFor(countCmmd);
 
   if (total == 0)
     total = 5000000;
@@ -241,12 +246,16 @@ int main( int argc, char** argv )
 	avg /= div;
 
 	double corr = 1.;
-	if (total > 0.) {
+	if (total > 0. || bCounts) {
 	  double len = 1;
 	  if (lencol >0)
 	    len = parser.AsFloat(lencol)/1000;
 	  double reads = avg*len*total/1000000;
 	  
+	  // Use real values, don't scale
+	  if (bCounts)
+	    reads = avg;
+
 	  corr = 1.-sqrt(reads)/reads;
 	  //cout << endl << "reads " << reads << " avg " << avg << " len " << len << " corr: " << corr << endl;
 	}

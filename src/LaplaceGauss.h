@@ -13,13 +13,13 @@ double Fold3(double a, double b) {
   return f;
 }
 
-void AddFold(svec<double> & hist, svec<double> & val, double scale) {
+void AddFold(svec<double> & hist, svec<double> & val, double scale, double thresh) {
   int i, j;
   for (i=0; i<val.isize(); i++) {
     for (j=0; j<val.isize(); j++) {
       if (i == j)
 	continue;
-      if (val[i] < 2. || val[j] < 2.)
+      if (val[i] < thresh || val[j] < thresh)
 	continue;
       double f = Fold3(val[i], val[j])/scale;
       int index = (int)(f+hist.isize()/2+0.5);
