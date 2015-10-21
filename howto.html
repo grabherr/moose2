@@ -31,8 +31,9 @@
     <br>
     MOOSE<sup>2</sup> requires two files:<br>
     <br>
-    <u>1. Expression values</u>: these can either be raw read counts or normalized data, listed in
-    a single file, one line per gene or transcript, e.g.:<br>
+    <u>1. Expression values</u>: these can either be raw read counts or
+    normalized data, listed in a single file, one line per gene or
+    transcript, e.g.:<br>
     <br>
     <font face="Courier New, Courier, monospace"><font face="Courier
         New, Courier, monospace">Gene
@@ -54,7 +55,6 @@
     e.g. the last one. Columns listing expression values have to be
     contiguous.<br>
     <br>
-   
     <br>
     <u>2. Replicate description</u>: this is a text file that specifies
     which samples are replicates, one line per replicate, preceded by an
@@ -78,14 +78,19 @@
     column&gt; -a &lt;average read or fragment count over all
     samples&gt;<br>
     <br>
+    IMPORTANT: If using read counts instead of FPKM/RPKM values, add the
+    option -counts.<br>
+    <br>
     <b>************** NOTE: column indices are 0-based!!</b>
     ****************<br>
     <br>
     with the available arguments:<br>
     <br>
     -i&lt;string&gt; : input file (all expression values) <br>
-    -r&lt;string&gt; : replicates file (one line per experiment, name followed by sample ids)<br>
-    -a&lt;string&gt; : average read counts per sample (def=0, needed for correcting significance for lowly expressed trsnacripts)<br>
+    -r&lt;string&gt; : replicates file (one line per experiment, name
+    followed by sample ids)<br>
+    -a&lt;string&gt; : average read counts per sample (def=0, needed for
+    correcting significance for lowly expressed trsnacripts)<br>
     -col&lt;string&gt; : column that specifies the transcript length
     (def=0, needed if RPKM/FPKM values are specified to estimate counts)<br>
     -w&lt;string&gt; : waypoint gene file (def=, one gene per line)<br>
@@ -114,7 +119,28 @@
     samples&gt; -l &lt;length column&gt;<br>
     <br>
     where you specify that file via the -r option.<br>
-    &nbsp;<br>
+    &nbsp; <br>
+    <br>
+    <b>Assessing the output.</b><br>
+    <br>
+    For quality assessment, the file distribution.txt contains both the
+    observed distribution, as well as the fitted model. If you visualize
+    both (note that the first line in the file contains the parameters,
+    the rest lists: position, observed, fitted), you should see a
+    distribution like this one (red = observed, black = model):<br>
+    <br>
+    <img alt="Distribution" title="Distribution" src="distrib.png"
+      height="354" width="500"><br>
+    <br>
+    where both follow each other very closely. Any discrepancy, in
+    particular in the tails, is indicative of the model not fitting the
+    data well. In most cases, this is caused by either a sample mix-up,
+    or an outlier sample. Building a dendrogram from your samples based
+    on expression distances should let you identify which sample is the
+    culprit. Removing the affected sample(s) from the replicate file
+    should correct the problem.<br>
+    <br>
+    <br>
     <br>
   </body>
 </html>
