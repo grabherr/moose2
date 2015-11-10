@@ -24,7 +24,7 @@ SYS_WARN	+= -ansi -pedantic -Wno-long-long
 
 # compiler options controlling C++ dialects:
 # for compiling
-SYS_WARN	+= -fno-nonansi-builtins
+# SYS_WARN	+= -fno-nonansi-builtins
 
 # compiler options controlling C++ dialects:
 # for optimization and code-generation
