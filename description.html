@@ -1,0 +1,95 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title>Technical description</title>
+  </head>
+  <body>
+    <big><big><big>Algorithms behind MOOSE<sup>2</sup></big></big></big><br>
+    <br>
+    <b>Background.</b><br>
+    <br>
+    In working with many different RNA-Seq data sets, we found that
+    accurate estimation of expression levels is still a difficult task,
+    mainly due to these reasons: there is variability in the sequencing
+    experiments, which can distort read counts depending on the
+    abundance of the underlying transcripts. As a result, it is unclear
+    how to interpret the results, and in particular what distribution to
+    use when quantifying the statistical significance at which genes
+    might be differentially expressed. Using any <i>ad hoc</i>
+    distribution, such as the negative binomial distribution, for the
+    only reason that "it fits better and models biological variation" is
+    rather unsatisfying, and leaves the question as to what causes this
+    "biological variation" open. With MOOSE<sup>2</sup>, we sought to
+    address these issues, including exploring a more biologically (or
+    perhaps even thermodynamically) relevant model to determine
+    significant differences.<br>
+    <br>
+    <br>
+    <b>Algorithms.</b><br>
+    <br>
+    The program performs multiple steps that are chained via a pipeline:<br>
+    <br>
+    1. Identify "reference genes" for normalization.<br>
+    <br>
+    MOOSE<sup>2</sup> performs a dynamic programming (DP) step to find
+    the cheapest path from the most lowly expressed gene to the most
+    highly expressed one. Known reference genes can here serve as "way
+    points" to guide the process and make it more accurate, even though
+    the algorithm seems to perform quite well without. The purpose of
+    this step is to identify genes and transcripts that do not vary in
+    expression, even though their expression values might appear quite
+    different in the beginning. The assumption behind using DP for this
+    task is that genes that are regulated differently depending on
+    condition, time point etc., are regulated to varying degrees, i.e.
+    some go up or down dramatically, whereas others are less regulated.
+    Unregulated genes, on the other hand, should appear similar to each
+    other, as long as their overall expression levels are similar, so
+    that DP can find a string of these genes by minimizing the distance
+    between them, but allowing for gradual change with increasing
+    expression. <br>
+    <br>
+    <br>
+    2. Polynomial fit to the data.<br>
+    <br>
+    MOOSE<sup>2</sup> fits a quadratic function to the data, thus
+    correcting different ranges of expression differently. While a
+    quadratic function is not theoretically justified, it is a pragmatic way to
+    apply a correction that depends on the abundance of transcription.<br>
+    <br>
+    <br>
+    3. Estimate the distribution.<br>
+    <br>
+    MOOSE<sup>2</sup> performs a least-square fit minimization of the
+    log differences of expression values to a convolution of a Laplace
+    and a Gauss distribution, based on comparing biological replicates.
+    In bacteria and plants, we found that the dominant component of the
+    distribution is the Laplace part, which is also used to model
+    time-dependent processes, such as the Brownian motion of particles,
+    or movement in the stock market. The Gauss part, on the other hand,
+    might model the true statistical variation that is reasonly to be
+    expected in any experiment.<br>
+    <br>
+    Ideally, each condition should have at least two replicates,
+    however, there is some indication that even a small number of
+    replicates can provide enough data points for accurate estimation of
+    the parameters.<br>
+    <br>
+    <br>
+    4. Estimate the significance.<br>
+    <br>
+    MOOSE<sup>2</sup> estimates the significance based on the
+    distribution described above, allowing for comparisons of multiple
+    replicates against multiple replicates. MOOSE<sup>2</sup> tests for
+    up- and down-regulation and computes two p-values (or e-values)
+    respectively, reflecting the combined probability of a gene
+    expressed significantly differentially in two conditions. Note that
+    these p-values are typically lower than the values computed by other
+    methods, so that using lower cut-off values for differential
+    expression is recommended (&lt;10<sup>-10</sup>). <br>
+    <br>
+    <br>
+    <br>
+    <br>
+  </body>
+</html>

@@ -1,0 +1,146 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title>How to run the program</title>
+  </head>
+  <body>
+    <big><big><big>How to run MOOSE<sup>2</sup></big></big></big><br>
+    <br>
+    <br>
+    <b>Building the software.</b><br>
+    <br>
+    MOOSE<sup>2</sup> is written in C++ and compiles and runs on Linux
+    and MacOS X and requires the gcc compiler. On the Mac, you will need
+    to install XCode on later OS version to get gcc.<br>
+    <br>
+    On the command line, type <br>
+    <br>
+    &gt; make<br>
+    <br>
+    to build the executables. To test whether the build was successful,
+    run<br>
+    <br>
+    &gt; ./test_it<br>
+    <br>
+    to run the software on data that comes with the repository. Note any
+    errors.<br>
+    <br>
+    <br>
+    <b>Input files.</b><br>
+    <br>
+    MOOSE<sup>2</sup> requires two files:<br>
+    <br>
+    <u>1. Expression values</u>: these can either be raw read counts or
+    normalized data, listed in a single file, one line per gene or
+    transcript, e.g.:<br>
+    <br>
+    <font face="Courier New, Courier, monospace"><font face="Courier
+        New, Courier, monospace">Gene
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        ex1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ex2&nbsp;&nbsp;&nbsp;
+        ex3&nbsp;&nbsp;&nbsp;&nbsp; ex7&nbsp;&nbsp;&nbsp;&nbsp;
+        ex9&nbsp;&nbsp;&nbsp;&nbsp; ex8&nbsp;&nbsp;&nbsp;&nbsp;
+        ex4&nbsp;&nbsp;&nbsp;&nbsp; ex5&nbsp;&nbsp;&nbsp;&nbsp; ex6<br>
+      </font>abgT.t01&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 49.6757
+      48.1321 34.522&nbsp; 33.4765 40.3088 49.9477 40.4558 53.1916
+      42.0341 1527<br>
+      abrB.t01&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 51.072&nbsp;
+      47.2778 29.0407 30.6346 33.9294 36.2579 39.7088 45.3439 42.7197
+      1047<br>
+      ...<br>
+    </font><br>
+    Where the first line serves as a header naming the samples. If
+    possible, also provide the transcript length in one of the columns,
+    e.g. the last one. Columns listing expression values have to be
+    contiguous.<br>
+    <br>
+    <br>
+    <u>2. Replicate description</u>: this is a text file that specifies
+    which samples are replicates, one line per replicate, preceded by an
+    experiment name, e.g:<br>
+    <br>
+    <font face="Courier New, Courier, monospace">healthy&nbsp;&nbsp; ex1
+      ex2 ex3<br>
+      sick&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ex7 ex8 ex9<br>
+      recovered ex4 ex5 ex6<br>
+    </font><br>
+    Additional/optional files are: a set of known reference gene (one
+    entry per line).<br>
+    <br>
+    <b>Running the program.</b><br>
+    <br>
+    On the command line, type<br>
+    <br>
+    ./Normalize -r &lt;replicates&gt; -i &lt;fpkm_data&gt; -f &lt;first
+    column containing fpkm data&gt; -l &lt;last column containing fpkm
+    data&gt; -w &lt;list of reference genes&gt; -col &lt;length
+    column&gt; -a &lt;average read or fragment count over all
+    samples&gt;<br>
+    <br>
+    IMPORTANT: If using read counts instead of FPKM/RPKM values, add the
+    option -counts.<br>
+    <br>
+    <b>************** NOTE: column indices are 0-based!!</b>
+    ****************<br>
+    <br>
+    with the available arguments:<br>
+    <br>
+    -i&lt;string&gt; : input file (all expression values) <br>
+    -r&lt;string&gt; : replicates file (one line per experiment, name
+    followed by sample ids)<br>
+    -a&lt;string&gt; : average read counts per sample (def=0, needed for
+    correcting significance for lowly expressed trsnacripts)<br>
+    -col&lt;string&gt; : column that specifies the transcript length
+    (def=0, needed if RPKM/FPKM values are specified to estimate counts)<br>
+    -w&lt;string&gt; : waypoint gene file (def=, one gene per line)<br>
+    -f&lt;string&gt; : first column with data (0-based) (def=1)<br>
+    -l&lt;string&gt; : last column with data (0-based) (def=0)<br>
+    <br>
+    <br>
+    <b>Output files.</b><br>
+    <br>
+    MOOSE<sup>2</sup> produces several output files:<br>
+    <br>
+    1. hmm_out: the set of genes assumed to be invariant in expression.<br>
+    <br>
+    2. normalized.out: the normalized expression values<br>
+    <br>
+    3. distribution.txt: the distribution parameters and values<br>
+    <br>
+    4. significance.txt the significance for each gene. Note that (a)
+    there two p-values for each comparison, one for up-, and one for
+    down-regulation. If you would like to test different sets of
+    comparisons, simply add a new replicate file that only contains the
+    comparisons you would like to make, and run <br>
+    <br>
+    ./RefGeneSignificance -d distribution.txt -a -i normalized.out -r
+    &lt;comparison file&gt; &lt;average read or fragment count over all
+    samples&gt; -l &lt;length column&gt;<br>
+    <br>
+    where you specify that file via the -r option.<br>
+    &nbsp; <br>
+    <br>
+    <b>Assessing the output.</b><br>
+    <br>
+    For quality assessment, the file distribution.txt contains both the
+    observed distribution, as well as the fitted model. If you visualize
+    both (note that the first line in the file contains the parameters,
+    the rest lists: position, observed, fitted), you should see a
+    distribution like this one (red = observed, black = model):<br>
+    <br>
+    <img alt="Distribution" title="Distribution" src="distrib.png"
+      height="354" width="500"><br>
+    <br>
+    where both follow each other very closely. Any discrepancy, in
+    particular in the tails, is indicative of the model not fitting the
+    data well. In most cases, this is caused by either a sample mix-up,
+    or an outlier sample. Building a dendrogram from your samples based
+    on expression distances should let you identify which sample is the
+    culprit. Removing the affected sample(s) from the replicate file
+    should correct the problem.<br>
+    <br>
+    <br>
+    <br>
+  </body>
+</html>
