@@ -20,6 +20,12 @@ public:
     m_dist = 0.;
     m_bYes = false;
     m_flat = 1.;
+
+    m_violation = VIOLATION_PENALTY;
+  }
+
+  void SetViolation(double v) {
+    m_violation = v;
   }
 
   void SetName(const string & name) {
@@ -98,7 +104,7 @@ public:
 
     for (i=0; i<isize(); i++) {
       if (m_pos[i] < n.m_pos[i])
-	dist += VIOLATION_PENALTY;
+	dist += m_violation;
     }
 
     //if (m_reward > 100)
@@ -138,6 +144,7 @@ private:
   string m_trail;
   bool m_bYes;
   double m_flat;
+  double m_violation;
 };
 
 
@@ -160,12 +167,14 @@ int main( int argc, char** argv )
   commandArg<string> wayCmmd("-w","waypoint gene file","");
   commandArg<int> firstCmmd("-f","first column with data (0-based)",1);
   commandArg<int> lastCmmd("-l","last column with data (0-based)",-1);
+  commandArg<double> penCmmd("-p","violation penalty",VIOLATION_PENALTY);
   commandLineParser P(argc,argv);
   P.SetDescription("Prepares a list of normalized reference genes for RPKM normalization.");
   P.registerArg(fileCmmd);
   P.registerArg(wayCmmd);
   P.registerArg(firstCmmd);
   P.registerArg(lastCmmd);
+  P.registerArg(penCmmd);
   
   P.parse();
   
@@ -174,6 +183,7 @@ int main( int argc, char** argv )
 
   int first =  P.GetIntValueFor(firstCmmd);
   int last =  P.GetIntValueFor(lastCmmd);
+  double pen =  P.GetDoubleValueFor(penCmmd);
 
 
   svec<string> waypoints;
@@ -249,6 +259,7 @@ int main( int argc, char** argv )
       hiscore = s;
       hi = nodes.isize();
     }
+    tmp.SetViolation(pen);
     tmp.ComputeDist();
     nodes.push_back(tmp);     
   }

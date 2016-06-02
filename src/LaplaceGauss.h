@@ -33,6 +33,19 @@ void AddFold(svec<double> & hist, svec<double> & val, double scale, double thres
   }
 }
 
+void AddFoldSingle(svec<double> & hist, double a, double b, double scale, double thresh) {
+  int i, j;
+  if (a < thresh || b < thresh)
+    return;
+  double f = Fold3(a, b)/scale;
+  int index = (int)(f+hist.isize()/2+0.5);
+  if (index < 0 || index >= hist.isize()) {
+    //cout << "OUT OF RANGE: " << val[i] << " " << val[j] << " " << f << endl;
+  } else {
+    hist[index] += 1.;
+  }
+ 
+}
 
 double Gauss(double center, double sigma, double x)
 {

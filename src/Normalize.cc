@@ -22,13 +22,14 @@ int main( int argc, char** argv )
 {
 
   commandArg<string> fileCmmd("-i","input file");
-  commandArg<string> repCmmd("-r","replicates file");
+  commandArg<string> repCmmd("-r","replicates file", "");
   commandArg<bool> countCmmd("-counts","process read COUNTS, not FPKMs",false);
   commandArg<string> readsCmmd("-a","average read counts per sample", "0");
   commandArg<string> lenCmmd("-col","column that specifies the transcript length", "0");
   commandArg<string> wayCmmd("-w","waypoint gene file","");
   commandArg<string> firstCmmd("-f","first column with data (0-based)","1");
   commandArg<string> lastCmmd("-l","last column with data (0-based)","0");
+  commandArg<string> penCmmd("-p","penalty for HMM (decrease to get more genes)","");
 
 
 
@@ -42,6 +43,7 @@ int main( int argc, char** argv )
   P.registerArg(wayCmmd);
   P.registerArg(firstCmmd);
   P.registerArg(lastCmmd);
+  P.registerArg(penCmmd);
   
   P.parse();
   
@@ -52,6 +54,7 @@ int main( int argc, char** argv )
   string readCount = P.GetStringValueFor(readsCmmd);
   string first = P.GetStringValueFor(firstCmmd);
   string last = P.GetStringValueFor(lastCmmd);
+  string pen = P.GetStringValueFor(penCmmd);
   bool bCounts = P.GetBoolValueFor(countCmmd);
 
   int i;
@@ -85,6 +88,11 @@ int main( int argc, char** argv )
   cmmd += " -l ";
   cmmd += last;
 
+  if (pen != "") {
+    cmmd += " -p ";
+    cmmd += pen;
+  }
+
   cmmd += " > hmm_out";
   Run(exec_dir, cmmd);
 
@@ -101,6 +109,11 @@ int main( int argc, char** argv )
   Run(exec_dir, cmmd);
 
   
+  if (repName == "") {
+    cout << "No replicates provided, not computing QA analysis" << endl;
+    return 0;
+  }
+
   //=============================================
   cmmd = "FitLaplaceNormal -i normalized.out ";
   cmmd += " -r ";
