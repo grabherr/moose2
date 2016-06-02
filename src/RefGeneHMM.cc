@@ -41,6 +41,11 @@ public:
   }
   const string & Trail() const {return m_trail;}
 
+  void SetHead(const string & name) {
+    m_head = name;
+  }
+  const string & Head() const {return m_head;}
+
   int isize() const {return m_pos.isize();}
   double & operator [] (int i) {return m_pos[i];}
   const double & operator [] (int i) const {return m_pos[i];}
@@ -125,6 +130,9 @@ public:
 
   void Print() const {
     cout << m_name << "\t";
+    if (m_head != "")
+      cout << m_head << "\t";
+
     for (int i=0; i<m_pos.isize(); i++)
       cout << m_pos[i] << "\t";
     cout << m_trail;
@@ -142,6 +150,7 @@ private:
   double m_reward;
   string m_name;
   string m_trail;
+  string m_head;
   bool m_bYes;
   double m_flat;
   double m_violation;
@@ -213,6 +222,11 @@ int main( int argc, char** argv )
     Node tmp;
     tmp.SetName(parser.AsString(0));
 
+    string head;
+    for (i=1; i<first; i++) {
+      head += parser.AsString(i);
+      head += " ";
+    }
     string trail;
     for (i=last+1; i<parser.GetItemCount(); i++) {
       trail += parser.AsString(i);
@@ -230,6 +244,9 @@ int main( int argc, char** argv )
     
  
     tmp.resize(last-first+1);
+
+    tmp.SetHead(head);
+    tmp.SetTrail(trail);
 
     double s = 0.;
     bool bSkip = false;
