@@ -27,7 +27,7 @@
     errors.<br>
     <br>
     <br>
-    <b>Input files.</b><br>
+    <b>Input files/summary</b><br>
     <br>
     MOOSE<sup>2</sup> requires two files:<br>
     <br>
@@ -56,9 +56,9 @@
     contiguous.<br>
     <br>
     <br>
-    <u>2. Replicate description</u>: this is a text file that specifies
-    which samples are replicates, one line per replicate, preceded by an
-    experiment name, e.g:<br>
+    <u>2. Replicate description</u>: this is an optional text file that
+    specifies which samples are replicates, one line per replicate,
+    preceded by an experiment name, e.g:<br>
     <br>
     <font face="Courier New, Courier, monospace">healthy&nbsp;&nbsp; ex1
       ex2 ex3<br>
@@ -68,7 +68,7 @@
     Additional/optional files are: a set of known reference gene (one
     entry per line).<br>
     <br>
-    <b>Running the program.</b><br>
+    <b>Running the program</b><br>
     <br>
     On the command line, type<br>
     <br>
@@ -87,8 +87,9 @@
     with the available arguments:<br>
     <br>
     -i&lt;string&gt; : input file (all expression values) <br>
-    -r&lt;string&gt; : replicates file (one line per experiment, name
-    followed by sample ids)<br>
+    -r&lt;string&gt; : replicates file (def=, one line per experiment,
+    name followed by sample ids)<br>
+    -counts&lt;bool&gt; : process read COUNTS, not FPKMs (def=0)<br>
     -a&lt;string&gt; : average read counts per sample (def=0, needed for
     correcting significance for lowly expressed trsnacripts)<br>
     -col&lt;string&gt; : column that specifies the transcript length
@@ -96,6 +97,48 @@
     -w&lt;string&gt; : waypoint gene file (def=, one gene per line)<br>
     -f&lt;string&gt; : first column with data (0-based) (def=1)<br>
     -l&lt;string&gt; : last column with data (0-based) (def=0)<br>
+    <br>
+    The parameter -i specifies the input matrix with (a) a header
+    providing the sample description; (b) a row per gene or isoform
+    specifying either read or pair counts, or FPKM/RPKM normalized
+    values, where the first element specifies the gene name or
+    identifier.<br>
+    <br>
+    Data can be provided in any consecutive set of columns, which need
+    to be specified via the -f (first column containing expression
+    values) and -l (last column containing expression values)
+    parameters, e.g. a file with 9 samples, in columns 1 through 9: <br>
+    <br>
+    gene&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    BB9 BB10 BB17 BB19 BB20 BB21 BB11 BB12 BB18 average<br>
+    aaeA.t01&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 45.6132 57.7381
+    35.4817 71.4413 75.5846 59.6099 93.7032 78.2685 75.4577
+    933&nbsp;&nbsp;&nbsp;&nbsp; 65.8776<br>
+    aaeB.t01&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 48.4527 42.2968
+    41.1391 44.0555 47.6292 51.5953 56.3065 69.1718 58.5695
+    1968&nbsp;&nbsp;&nbsp; 51.024<br>
+    <br>
+    is provided via -f 1 -l 9. If the transcript or gene lengths is part
+    of this file, optionally specify via the -col option (this is for QA
+    only, as are the -counts and -a options).<br>
+    <br>
+    A replicate file, which is required for QA only, can be specified in
+    the format:<br>
+    <br>
+    condition1 sampleA sampleB sampleC<br>
+    condition2 sampleD sampleE<br>
+    &nbsp;
+    <br>
+    where each line specifies one condition, followed by the samples
+    obtained from that condition.<br>
+    <br>
+    A waypoint file containing confirmed invariant genes can be provided
+    via the -w option as a file containing one gene name per line. Note
+    that the gene names have to match exactly the names or ids in the
+    data file.&nbsp; <br>
+    <br>
+    For an example, see the script ./test_it that comes with the
+    repository.<br>
     <br>
     <br>
     <b>Output files.</b><br>
@@ -106,22 +149,11 @@
     <br>
     2. normalized.out: the normalized expression values<br>
     <br>
-    3. distribution.txt: the distribution parameters and values<br>
+    3. distribution.txt: the distribution parameters and values or
+    within replicate comparisons for quality assurance purposes<br>
     <br>
-    4. significance.txt the significance for each gene. Note that (a)
-    there two p-values for each comparison, one for up-, and one for
-    down-regulation. If you would like to test different sets of
-    comparisons, simply add a new replicate file that only contains the
-    comparisons you would like to make, and run <br>
     <br>
-    ./RefGeneSignificance -d distribution.txt -a -i normalized.out -r
-    &lt;comparison file&gt; &lt;average read or fragment count over all
-    samples&gt; -l &lt;length column&gt;<br>
-    <br>
-    where you specify that file via the -r option.<br>
-    &nbsp; <br>
-    <br>
-    <b>Assessing the output.</b><br>
+    <b>Quality assessment (optional)</b><br>
     <br>
     For quality assessment, the file distribution.txt contains both the
     observed distribution, as well as the fitted model. If you visualize
@@ -132,13 +164,8 @@
     <img alt="Distribution" title="Distribution" src="distrib.png"
       height="354" width="500"><br>
     <br>
-    where both follow each other very closely. Any discrepancy, in
-    particular in the tails, is indicative of the model not fitting the
-    data well. In most cases, this is caused by either a sample mix-up,
-    or an outlier sample. Building a dendrogram from your samples based
-    on expression distances should let you identify which sample is the
-    culprit. Removing the affected sample(s) from the replicate file
-    should correct the problem.<br>
+    where both follow each other very closely. A discrepancy might be
+    indicative of an experimental problem.<br>
     <br>
     <br>
     <br>

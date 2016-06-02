@@ -54,39 +54,34 @@
     <br>
     MOOSE<sup>2</sup> fits a quadratic function to the data, thus
     correcting different ranges of expression differently. While a
-    quadratic function is not theoretically justified, it is a pragmatic way to
-    apply a correction that depends on the abundance of transcription.<br>
+    quadratic function is not theoretically justified, it is a pragmatic
+    way to apply a correction that depends on the abundance of
+    transcription.<br>
     <br>
+    3. Estimate significance for differential expression.<br>
     <br>
-    3. Estimate the distribution.<br>
+    To compute significance (p-values) for cross-sample comparisons, we
+    recommend <a
+      href="https://bioconductor.org/packages/release/bioc/html/limma.html">limma</a>.
+    A program for processing moose2-normalized data is here: <a
+      class="moz-txt-link-freetext"
+      href="https://github.com/thokall/ManfredData">https://github.com/thokall/ManfredData</a>.<br>
     <br>
-    MOOSE<sup>2</sup> performs a least-square fit minimization of the
-    log differences of expression values to a convolution of a Laplace
-    and a Gauss distribution, based on comparing biological replicates.
-    In bacteria and plants, we found that the dominant component of the
-    distribution is the Laplace part, which is also used to model
-    time-dependent processes, such as the Brownian motion of particles,
-    or movement in the stock market. The Gauss part, on the other hand,
-    might model the true statistical variation that is reasonly to be
-    expected in any experiment.<br>
-    <br>
-    Ideally, each condition should have at least two replicates,
-    however, there is some indication that even a small number of
-    replicates can provide enough data points for accurate estimation of
-    the parameters.<br>
-    <br>
-    <br>
-    4. Estimate the significance.<br>
-    <br>
+    Alternatively - and highly experimentally!! - MOOSE<sup>2</sup>
+    performs a least-square fit minimization of the log differences of
+    expression values to a convolution of a Laplace and a Gauss
+    distribution, based on comparing biological replicates. This works,
+    however, only if each condition has at least two replicates, since
     MOOSE<sup>2</sup> estimates the significance based on the
-    distribution described above, allowing for comparisons of multiple
-    replicates against multiple replicates. MOOSE<sup>2</sup> tests for
-    up- and down-regulation and computes two p-values (or e-values)
-    respectively, reflecting the combined probability of a gene
-    expressed significantly differentially in two conditions. Note that
-    these p-values are typically lower than the values computed by other
-    methods, so that using lower cut-off values for differential
-    expression is recommended (&lt;10<sup>-10</sup>). <br>
+    distribution described above, also allowing for comparisons of
+    multiple replicates against multiple replicates. MOOSE<sup>2</sup>
+    tests for up- and down-regulation and computes two p-values (or
+    e-values) respectively, reflecting the combined probability of a
+    gene expressed significantly differentially in two conditions. Note
+    that these p-values are typically lower than the values computed by
+    other methods, so that we do not recommend to use this method for
+    any publication at this point. A follow-up manuscript will discuss
+    this in more detail.<br>
     <br>
     <br>
     <br>
