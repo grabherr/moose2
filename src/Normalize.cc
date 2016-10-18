@@ -30,6 +30,8 @@ int main( int argc, char** argv )
   commandArg<string> firstCmmd("-f","first column with data (0-based)","1");
   commandArg<string> lastCmmd("-l","last column with data (0-based)","0");
   commandArg<string> penCmmd("-p","penalty for HMM (decrease to get more genes)","");
+  commandArg<bool> linCmmd("-linear","uses a linear model",false);
+  commandArg<bool> fCmmd("-force","forces a polynomial fit (not recommendedd)",false);
 
 
 
@@ -44,6 +46,8 @@ int main( int argc, char** argv )
   P.registerArg(firstCmmd);
   P.registerArg(lastCmmd);
   P.registerArg(penCmmd);
+  P.registerArg(linCmmd);
+  P.registerArg(fCmmd);
   
   P.parse();
   
@@ -56,6 +60,8 @@ int main( int argc, char** argv )
   string last = P.GetStringValueFor(lastCmmd);
   string pen = P.GetStringValueFor(penCmmd);
   bool bCounts = P.GetBoolValueFor(countCmmd);
+  bool bLin = P.GetBoolValueFor(linCmmd);
+  bool bForce = P.GetBoolValueFor(fCmmd);
 
   int i;
 
@@ -104,6 +110,11 @@ int main( int argc, char** argv )
   cmmd += first;
   cmmd += " -l ";
   cmmd += last;
+
+  if (bForce)
+    cmmd += " -force ";
+  if (bLin)
+    cmmd += " -linear ";
 
   cmmd += " > normalized.out";
   Run(exec_dir, cmmd);
