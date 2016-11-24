@@ -199,7 +199,7 @@ double SumY2(const svec<double> & x, const svec<double> & y) {
   return d;
 }
 
-void PolyReg(double & a, double & b, double & c, const svec<double> & x, const svec<double> & y) 
+bool PolyReg(double & a, double & b, double & c, const svec<double> & x, const svec<double> & y) 
 {
   double n = x.isize();
 
@@ -224,12 +224,15 @@ void PolyReg(double & a, double & b, double & c, const svec<double> & x, const s
   b = eq.b();
   c = eq.c();
 
+  bool bSuccess = true;
+
   if (b < 0 || b > 3.) {
     a = 0.;
     c = 0.;
     Linear backoff;
     b = backoff.Value(x, y);
     cerr << "Fallback to a=" << a << " b=" << b << " c=" << c << endl;
+    bSuccess = false;
   }
 
   //a = (Sum(y)*Sum2(x)-Sum(x)*Sum(x,y))/(n*Sum2(x)-Sum(x)*Sum(x));
@@ -245,7 +248,7 @@ void PolyReg(double & a, double & b, double & c, const svec<double> & x, const s
  
     }*/
 
-
+  return bSuccess;
 }
 
 
@@ -257,13 +260,15 @@ int main( int argc, char** argv )
   commandArg<int> firstCmmd("-f","first column with data (0-based)",1);
   commandArg<int> lastCmmd("-l","last column with data (0-based)",-1);
   commandArg<bool> linCmmd("-linear","use linear regression",false);
+  commandArg<bool> fCmmd("-force","force polynomial fit",false);
   commandLineParser P(argc,argv);
-  P.SetDescription("Prepares a list of normalized reference genes for RPKM normalization.");
+  P.SetDescription("Normalizes a list of genes.");
   P.registerArg(fileCmmd);
   P.registerArg(wayCmmd);
   P.registerArg(firstCmmd);
   P.registerArg(lastCmmd);
   P.registerArg(linCmmd);
+  P.registerArg(fCmmd);
   
   P.parse();
   
@@ -272,6 +277,7 @@ int main( int argc, char** argv )
   int first =  P.GetIntValueFor(firstCmmd);
   int last =  P.GetIntValueFor(lastCmmd);
   bool bLin =  P.GetBoolValueFor(linCmmd);
+  bool bForce =  P.GetBoolValueFor(fCmmd);
 
   Waypoints w(last-first+1);
 
@@ -326,7 +332,11 @@ int main( int argc, char** argv )
   for (i=0; i<a.isize(); i++) {     
     l[i] = lin.Value(w.Get(i), avg);
     if (!bLin) {
-      PolyReg(a[i], b[i], c[i], w.Get(i), avg);
+      bool bYes = PolyReg(a[i], b[i], c[i], w.Get(i), avg);
+      if (!bYes && !bForce) {
+	cout << "ERROR: Sample " << i << " failed! Use the -linear or -force option to proceed anyway." << endl;
+	exit(-1);
+      }
     } else {
       a[i] = 0.;
       b[i] = l[i];
