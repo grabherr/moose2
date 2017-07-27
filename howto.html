@@ -86,17 +86,32 @@
     <br>
     with the available arguments:<br>
     <br>
-    -i&lt;string&gt; : input file (all expression values) <br>
-    -r&lt;string&gt; : replicates file (def=, one line per experiment,
-    name followed by sample ids)<br>
-    -counts&lt;bool&gt; : process read COUNTS, not FPKMs (def=0)<br>
-    -a&lt;string&gt; : average read counts per sample (def=0, needed for
-    correcting significance for lowly expressed trsnacripts)<br>
-    -col&lt;string&gt; : column that specifies the transcript length
-    (def=0, needed if RPKM/FPKM values are specified to estimate counts)<br>
-    -w&lt;string&gt; : waypoint gene file (def=, one gene per line)<br>
-    -f&lt;string&gt; : first column with data (0-based) (def=1)<br>
-    -l&lt;string&gt; : last column with data (0-based) (def=0)<br>
+    <tt>-i&lt;string&gt; : input file (all expression values) </tt><tt><br>
+    </tt><tt> -r&lt;string&gt; : replicates file (def=, one line per
+      experiment, name followed by sample ids)</tt><tt><br>
+    </tt><tt> -counts&lt;bool&gt; : process read COUNTS, not FPKMs
+      (def=0)</tt><tt><br>
+    </tt><tt> -a&lt;string&gt; : average read counts per sample (def=0,
+      needed for correcting significance for lowly expressed
+      trsnacripts)</tt><tt><br>
+    </tt><tt> -col&lt;string&gt; : column that specifies the transcript
+      length (def=0, needed if RPKM/FPKM values are specified to
+      estimate counts)</tt><tt><br>
+    </tt><tt> -w&lt;string&gt; : waypoint gene file (def=, one gene per
+      line)</tt><tt><br>
+    </tt><tt> -f&lt;string&gt; : first column with data (0-based)
+      (def=1)</tt><tt><br>
+    </tt><tt> -l&lt;string&gt; : last column with data (0-based) (def=0)</tt><tt><br>
+    </tt><tt> -p&lt;string&gt; : penalty for HMM (decrease to get more
+      genes) (def=) /* this is the HMM parameter</tt><tt><i> h</i></tt><tt>,
+      which defaults to 5. */</tt><tt><br>
+    </tt><tt> -rw&lt;string&gt; : reward to pick up genes (def=) /* this
+      is the HMM parameter </tt><tt><i>m</i></tt><tt>, which defaults
+      to 4. */</tt><tt><br>
+    </tt><tt> -linear&lt;bool&gt; : uses a linear model (def=0)</tt><tt><br>
+    </tt><tt> -force&lt;bool&gt; : forces a polynomial fit (not
+      recommended) (def=0)</tt><br>
+    <br>
     <br>
     The parameter -i specifies the input matrix with (a) a header
     providing the sample description; (b) a row per gene or isoform
@@ -109,14 +124,15 @@
     values) and -l (last column containing expression values)
     parameters, e.g. a file with 9 samples, in columns 1 through 9: <br>
     <br>
-    gene&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-    BB9 BB10 BB17 BB19 BB20 BB21 BB11 BB12 BB18 average<br>
-    aaeA.t01&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 45.6132 57.7381
-    35.4817 71.4413 75.5846 59.6099 93.7032 78.2685 75.4577
-    933&nbsp;&nbsp;&nbsp;&nbsp; 65.8776<br>
-    aaeB.t01&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 48.4527 42.2968
-    41.1391 44.0555 47.6292 51.5953 56.3065 69.1718 58.5695
-    1968&nbsp;&nbsp;&nbsp; 51.024<br>
+    <tt>gene&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
+      BB9 BB10 BB17 BB19 BB20 BB21 BB11 BB12 BB18 average</tt><tt><br>
+    </tt><tt> aaeA.t01&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 45.6132
+      57.7381 35.4817 71.4413 75.5846 59.6099 93.7032 78.2685 75.4577
+      933&nbsp;&nbsp;&nbsp;&nbsp; 65.8776</tt><tt><br>
+    </tt><tt> aaeB.t01&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 48.4527
+      42.2968 41.1391 44.0555 47.6292 51.5953 56.3065 69.1718 58.5695
+      1968&nbsp;&nbsp;&nbsp; 51.024</tt><br>
     <br>
     is provided via -f 1 -l 9. If the transcript or gene lengths is part
     of this file, optionally specify via the -col option (this is for QA
@@ -127,8 +143,7 @@
     <br>
     condition1 sampleA sampleB sampleC<br>
     condition2 sampleD sampleE<br>
-    &nbsp;
-    <br>
+    &nbsp; <br>
     where each line specifies one condition, followed by the samples
     obtained from that condition.<br>
     <br>
@@ -151,6 +166,16 @@
     <br>
     3. distribution.txt: the distribution parameters and values or
     within replicate comparisons for quality assurance purposes<br>
+    <br>
+    <b><br>
+      Controlling the number of <i>in silico</i> invariant genes.</b><br>
+    <br>
+    The number of invariant gene predictions depends on a number of
+    factors, including the number of samples, number of genes etc. To
+    increase the number of genes, increase the HMM reward m (-p option,
+    default=5) and/or decrease the HMM penalty h (-rw option,
+    default=4). In the example data, the default setting produce 33
+    predictions, -m 6 -h 3 results in 53 predictions etc.<br>
     <br>
     <br>
     <b>Quality assessment (optional)</b><br>
