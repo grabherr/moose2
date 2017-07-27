@@ -27,6 +27,9 @@ public:
   void SetViolation(double v) {
     m_violation = v;
   }
+  void SetReward(double v) {
+    m_reward = v;
+  }
 
   void SetName(const string & name) {
     m_name = name;
@@ -177,6 +180,7 @@ int main( int argc, char** argv )
   commandArg<int> firstCmmd("-f","first column with data (0-based)",1);
   commandArg<int> lastCmmd("-l","last column with data (0-based)",-1);
   commandArg<double> penCmmd("-p","violation penalty",VIOLATION_PENALTY);
+  commandArg<double> rewCmmd("-r","reward",REWARD);
   commandLineParser P(argc,argv);
   P.SetDescription("Prepares a list of normalized reference genes for RPKM normalization.");
   P.registerArg(fileCmmd);
@@ -184,6 +188,7 @@ int main( int argc, char** argv )
   P.registerArg(firstCmmd);
   P.registerArg(lastCmmd);
   P.registerArg(penCmmd);
+  P.registerArg(rewCmmd);
   
   P.parse();
   
@@ -193,6 +198,7 @@ int main( int argc, char** argv )
   int first =  P.GetIntValueFor(firstCmmd);
   int last =  P.GetIntValueFor(lastCmmd);
   double pen =  P.GetDoubleValueFor(penCmmd);
+  double rew =  P.GetDoubleValueFor(rewCmmd);
 
 
   svec<string> waypoints;
@@ -221,6 +227,7 @@ int main( int argc, char** argv )
 
     Node tmp;
     tmp.SetName(parser.AsString(0));
+    tmp.SetReward(rew);
 
     string head;
     for (i=1; i<first; i++) {

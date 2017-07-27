@@ -30,6 +30,7 @@ int main( int argc, char** argv )
   commandArg<string> firstCmmd("-f","first column with data (0-based)","1");
   commandArg<string> lastCmmd("-l","last column with data (0-based)","0");
   commandArg<string> penCmmd("-p","penalty for HMM (decrease to get more genes)","");
+  commandArg<string> rewCmmd("-rw","reward to pick up genes","");
   commandArg<bool> linCmmd("-linear","uses a linear model",false);
   commandArg<bool> fCmmd("-force","forces a polynomial fit (not recommendedd)",false);
 
@@ -46,6 +47,7 @@ int main( int argc, char** argv )
   P.registerArg(firstCmmd);
   P.registerArg(lastCmmd);
   P.registerArg(penCmmd);
+  P.registerArg(rewCmmd);
   P.registerArg(linCmmd);
   P.registerArg(fCmmd);
   
@@ -59,6 +61,7 @@ int main( int argc, char** argv )
   string first = P.GetStringValueFor(firstCmmd);
   string last = P.GetStringValueFor(lastCmmd);
   string pen = P.GetStringValueFor(penCmmd);
+  string rew = P.GetStringValueFor(rewCmmd);
   bool bCounts = P.GetBoolValueFor(countCmmd);
   bool bLin = P.GetBoolValueFor(linCmmd);
   bool bForce = P.GetBoolValueFor(fCmmd);
@@ -97,6 +100,10 @@ int main( int argc, char** argv )
   if (pen != "") {
     cmmd += " -p ";
     cmmd += pen;
+  }
+  if (rew != "") {
+    cmmd += " -r ";
+    cmmd += rew;
   }
 
   cmmd += " > hmm_out";
