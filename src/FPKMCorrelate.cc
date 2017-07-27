@@ -54,7 +54,8 @@ void Read(FPKM & out, const string & fileName, double min)
 
 
   int n = (int)(0.5+min*(double)(parser.GetItemCount()-1));
-  
+
+  int good = 0;
   while (parser.ParseLine()) {
     if (parser.GetItemCount() == 0)
       continue;
@@ -65,11 +66,14 @@ void Read(FPKM & out, const string & fileName, double min)
     }
     if (m < n)
       continue;
+
+    good++;
     
     for (i=0; i<index.isize(); i++) {
       out.Add(i, parser.AsFloat(index[i]));
     }
   }
+  cerr << "Passed: " << good << endl;
 }
 
 int main( int argc, char** argv )

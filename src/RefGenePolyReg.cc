@@ -106,6 +106,8 @@ void Equation::Solve()
   
   
   cerr << "a=" << m_a << " b=" << m_b << " c=" << m_c << endl;
+
+ 
 }
 
 
@@ -328,6 +330,8 @@ int main( int argc, char** argv )
   c.resize(last-first+1);
   l.resize(last-first+1);
 
+  FILE * p = fopen("factors.out", "w");
+
   Linear lin;
   for (i=0; i<a.isize(); i++) {     
     l[i] = lin.Value(w.Get(i), avg);
@@ -337,15 +341,23 @@ int main( int argc, char** argv )
 	cout << "ERROR: Sample " << i << " failed! Use the -linear or -force option to proceed anyway." << endl;
 	exit(-1);
       }
+      //FILE * p = fopen("factors.out", "a");
+      fprintf(p, "%f %f %f\n", a[i], b[i], c[i]);
+      //fclose(p);
+      cerr << "OUCH!" << endl;
     } else {
       a[i] = 0.;
       b[i] = l[i];
       c[i] = 0.;
       cerr << "Using linear model a=" << a[i] << " b=" << b[i] << " c=" << c[i] << endl;
+      //FILE * p = fopen("factors.out", "a");
+      fprintf(p, "%f %f %f\n", a[i], b[i], c[i]);
+      //fclose(p);
+
     }
   }
   
- 
+  fclose(p);
  
   FlatFileParser parser;
   
@@ -365,37 +377,11 @@ int main( int argc, char** argv )
 	double x, y;
 	y = log(d);
  
-	/*
-	//cout << "1: " << d << endl;
-	
-	double aa = a[i-1];
-	double bb = b[i-1];
-	double cc = c[i-1];
-	if (c[i-1] != 0) {
-	  //cout << aa << " " << bb << " " << cc << endl;
-	  double mul = 1.;
-	  if (cc < 0)
-	    mul = -1.;
-	  x = mul*sqrt(y/cc-aa/cc+bb*bb/(4*cc*cc)) - bb/(2*cc);
-	  double check = a[i-1]+b[i-1]*x+c[i-1]*x*x;
-	  //cout << " x= " << x << " y=" << y << " check " << check << endl;	  
-	} else {
-	  x = (y - aa)/bb;
-	}
-	//cout << endl;
-	//cout << d << " " << inv << endl;
-	//cout << endl;
-	*/
 
 	x = a[i-first]+b[i-first]*y+c[i-first]*y*y;
-	//cout << "1: " << d << endl;
 	val = exp(x);
 	
-	//val = x*y/d;
-
-	//val = x*d/y;
-	//cout << "1: " << d << endl;
-      } else {
+     } else {
 	// Backoff to linear
 	double bb = log(bound);
 	double vv = a[i-first]+b[i-first]*bb+c[i-first]*bb*bb;
