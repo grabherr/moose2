@@ -68,6 +68,7 @@ void Read(FPKM & out, const string & fileName, double min)
       continue;
 
     good++;
+    cerr << "Accept: " << parser.AsString(0) << endl;
     
     for (i=0; i<index.isize(); i++) {
       out.Add(i, parser.AsFloat(index[i]));
