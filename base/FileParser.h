@@ -1,4 +1,4 @@
-
+#define FORCE_DEBUG
 
 #ifndef FILEPARSER_H_
 #define FILEPARSER_H_
@@ -39,7 +39,7 @@ class StringParser
 
  private:
   CMAsciiReadFileStream m_file;
-  vector<string> m_items;
+  svec<string> m_items;
 
 };
 

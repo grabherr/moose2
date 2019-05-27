@@ -1,3 +1,5 @@
+#define FORCE_DEBUG
+
 #include <string>
 #include "base/CommandLineParser.h"
 #include "base/FileParser.h"
