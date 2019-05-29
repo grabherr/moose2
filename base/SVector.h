@@ -9,7 +9,7 @@ using namespace std;
 #include <algorithm>
 #include "base/ErrorHandling.h"
 
-#define FORCE_DEBUG
+//#define FORCE_DEBUG
 
 template <class T> 
 class svec : public vector<T> 

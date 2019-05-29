@@ -183,6 +183,7 @@ int main( int argc, char** argv )
   commandArg<int> lastCmmd("-l","last column with data (0-based)",-1);
   commandArg<double> penCmmd("-p","violation penalty",VIOLATION_PENALTY);
   commandArg<double> rewCmmd("-r","reward",REWARD);
+  commandArg<double> threshCmmd("-t","minimum expression",1.);
   commandLineParser P(argc,argv);
   P.SetDescription("Prepares a list of normalized reference genes for RPKM normalization.");
   P.registerArg(fileCmmd);
@@ -191,7 +192,8 @@ int main( int argc, char** argv )
   P.registerArg(lastCmmd);
   P.registerArg(penCmmd);
   P.registerArg(rewCmmd);
-  
+  P.registerArg(threshCmmd);
+ 
   P.parse();
   
   string fileName = P.GetStringValueFor(fileCmmd);
@@ -201,6 +203,7 @@ int main( int argc, char** argv )
   int last =  P.GetIntValueFor(lastCmmd);
   double pen =  P.GetDoubleValueFor(penCmmd);
   double rew =  P.GetDoubleValueFor(rewCmmd);
+  double thresh =  P.GetDoubleValueFor(threshCmmd);
 
 
   svec<string> waypoints;
@@ -262,7 +265,7 @@ int main( int argc, char** argv )
     for (i=first; i<=last; i++) {
       tmp[i-first] = parser.AsFloat(i);
       s += tmp[i-first];
-      if (tmp[i-first] < 1.)
+      if (tmp[i-first] < thresh)
 	bSkip = true;
     }
 
@@ -274,6 +277,7 @@ int main( int argc, char** argv )
 	cout << "Skip waypoint (2) " << tmp.Name() << endl;
 	}*/
 
+    //cout << s << " " << tmp.isize() << " " << bSkip << endl;
     if (s < tmp.isize() || bSkip)
       continue;
 
@@ -290,25 +294,28 @@ int main( int argc, char** argv )
     nodes.push_back(tmp);     
   }
 
-  
+  //cout << "Lo: " << lo << endl;
+  //cout << nodes[lo].Score() << endl;
+  //nodes[lo].Print();
+ 
   nodes[lo].SetScore(0);
   hi = nodes.isize()-1;
   lo = 0;
 
   Sort(nodes);
-  //cout << "Lo: " << lo << " " << nodes[lo].Score() << endl;
-  //nodes[lo].Print();
   int k;
   bool bCont = true;
+  j = 0;
   for (j=0; j<nodes.isize(); j++) {
-    //cout << "Iteration " << j << " of " << nodes.isize() << endl;
+    
+    //cerr << "Iteration " << j << " of " << nodes.isize() << endl;
     if (!bCont)
       break;
 
     bCont = false;
     for (i=j; i<nodes.isize(); i++) {
     
-      //cout << "NODE: " << i << endl;
+      //cerr << "  node: " << i << endl;
       for (k=i+1; k<nodes.isize(); k++) {
 	Node & f = nodes[i];
 	Node & t = nodes[k];

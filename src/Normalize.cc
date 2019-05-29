@@ -1,7 +1,7 @@
 #include <string>
 #include "base/CommandLineParser.h"
 #include "base/FileParser.h"
-
+#include "base/StringUtil.h"
 
 int Run(const string & exec, const string & cmmd)
 {
@@ -31,6 +31,7 @@ int main( int argc, char** argv )
   commandArg<string> lastCmmd("-l","last column with data (0-based)","0");
   commandArg<string> penCmmd("-p","penalty for HMM (decrease to get more genes)","");
   commandArg<string> rewCmmd("-rw","reward to pick up genes","");
+  commandArg<string> threshCmmd("-t","minimum expression for any sample to count in the HMM","1.");
   commandArg<bool> linCmmd("-linear","uses a linear model",false);
   commandArg<bool> fCmmd("-force","forces a polynomial fit (not recommendedd)",false);
 
@@ -48,6 +49,7 @@ int main( int argc, char** argv )
   P.registerArg(lastCmmd);
   P.registerArg(penCmmd);
   P.registerArg(rewCmmd);
+  P.registerArg(threshCmmd);
   P.registerArg(linCmmd);
   P.registerArg(fCmmd);
   
@@ -62,6 +64,7 @@ int main( int argc, char** argv )
   string last = P.GetStringValueFor(lastCmmd);
   string pen = P.GetStringValueFor(penCmmd);
   string rew = P.GetStringValueFor(rewCmmd);
+  string thresh = P.GetStringValueFor(threshCmmd);
   bool bCounts = P.GetBoolValueFor(countCmmd);
   bool bLin = P.GetBoolValueFor(linCmmd);
   bool bForce = P.GetBoolValueFor(fCmmd);
@@ -105,6 +108,8 @@ int main( int argc, char** argv )
     cmmd += " -r ";
     cmmd += rew;
   }
+  cmmd += " -t ";
+  cmmd += thresh;
 
   cmmd += " > hmm_out";
   Run(exec_dir, cmmd);
