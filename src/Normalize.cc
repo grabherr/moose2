@@ -127,7 +127,10 @@ int main( int argc, char** argv )
     cmmd += " -force ";
   if (bLin)
     cmmd += " -linear ";
-
+  
+  cmmd += " -t ";
+  cmmd += thresh;
+ 
   cmmd += " > normalized.out";
   Run(exec_dir, cmmd);
 

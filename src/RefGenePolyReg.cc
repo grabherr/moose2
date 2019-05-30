@@ -48,6 +48,7 @@ void Equation::Solve()
 
   double n = Get(1, 0);
 
+  //cout << "n=" << n << endl;
   int i;
 
   // Make a 1
@@ -57,12 +58,14 @@ void Equation::Solve()
   Set(3, 0, Get(3, 0)/n);
 
   n = Get(1, 1);
+  //cout << "n=" << n << endl;
   Set(0, 1, Get(0, 1)/n);
   Set(1, 1, Get(1, 1)/n);
   Set(2, 1, Get(2, 1)/n);
   Set(3, 1, Get(3, 1)/n);
 
   n = Get(1, 2);
+  //cout << "n=" << n << endl;
   Set(0, 2, Get(0, 2)/n);
   Set(1, 2, Get(1, 2)/n);
   Set(2, 2, Get(2, 2)/n);
@@ -205,6 +208,8 @@ bool PolyReg(double & a, double & b, double & c, const svec<double> & x, const s
 {
   double n = x.isize();
 
+  //cout << "SUM " << Sum(x) << " " << Sum(y) << endl;
+  
   Equation eq;
   eq.Set(0, 0, -Sum(y));
   eq.Set(1, 0, n);
@@ -226,6 +231,8 @@ bool PolyReg(double & a, double & b, double & c, const svec<double> & x, const s
   b = eq.b();
   c = eq.c();
 
+  //cout << "RESULT: " << a << " " << b << " " << c << endl;
+  
   bool bSuccess = true;
 
   if (b < 0 || b > 3.) {
@@ -263,6 +270,7 @@ int main( int argc, char** argv )
   commandArg<int> lastCmmd("-l","last column with data (0-based)",-1);
   commandArg<bool> linCmmd("-linear","use linear regression",false);
   commandArg<bool> fCmmd("-force","force polynomial fit",false);
+  commandArg<double> tCmmd("-t","threshold",1.);
   commandLineParser P(argc,argv);
   P.SetDescription("Normalizes a list of genes.");
   P.registerArg(fileCmmd);
@@ -271,7 +279,8 @@ int main( int argc, char** argv )
   P.registerArg(lastCmmd);
   P.registerArg(linCmmd);
   P.registerArg(fCmmd);
-  
+  P.registerArg(tCmmd);
+ 
   P.parse();
   
   string fileName = P.GetStringValueFor(fileCmmd);
@@ -280,6 +289,7 @@ int main( int argc, char** argv )
   int last =  P.GetIntValueFor(lastCmmd);
   bool bLin =  P.GetBoolValueFor(linCmmd);
   bool bForce =  P.GetBoolValueFor(fCmmd);
+  double thresh =  P.GetDoubleValueFor(tCmmd);
 
   Waypoints w(last-first+1);
 
@@ -299,7 +309,7 @@ int main( int argc, char** argv )
 
     bool bSkip = false;
     for (i=first; i<=last; i++) {
-      if (parser1.AsFloat(i) < 1.)
+      if (parser1.AsFloat(i) < thresh)
 	bSkip = true;
     }
     if (bSkip)
@@ -316,10 +326,11 @@ int main( int argc, char** argv )
     double m = 0.;
     double div = 0.;
     for (i=first; i<=last; i++) {
-      w.AddData(i-first, log(parser1.AsFloat(i)));
-      m += log(parser1.AsFloat(i));
+      w.AddData(i-first, log(1.+parser1.AsFloat(i)));
+      m += log(1.+parser1.AsFloat(i));
       div += 1.;
     }
+    //cout << m << " " << div << endl;
     avg.push_back(m/div);
   }
 
@@ -344,7 +355,7 @@ int main( int argc, char** argv )
       //FILE * p = fopen("factors.out", "a");
       fprintf(p, "%f %f %f\n", a[i], b[i], c[i]);
       //fclose(p);
-      cerr << "OUCH!" << endl;
+      //cerr << "OUCH!" << endl;
     } else {
       a[i] = 0.;
       b[i] = l[i];
@@ -370,7 +381,7 @@ int main( int argc, char** argv )
       continue;
     cout << parser.AsString(0);
     for (i=first; i<=last; i++) {
-      double d = parser.AsFloat(i);
+      double d = parser.AsFloat(i)+1.;
    
       double val;
       if (d > bound) {
@@ -379,13 +390,13 @@ int main( int argc, char** argv )
  
 
 	x = a[i-first]+b[i-first]*y+c[i-first]*y*y;
-	val = exp(x);
+	val = exp(x)-1;
 	
      } else {
 	// Backoff to linear
 	double bb = log(bound);
 	double vv = a[i-first]+b[i-first]*bb+c[i-first]*bb*bb;
-	vv = exp(vv);
+	vv = exp(vv)-1;
 	val = d / bound * vv;
 	//cerr << endl << "Before: " << d << " after " << val << " vv: " << vv << endl;
       }

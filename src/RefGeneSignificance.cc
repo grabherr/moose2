@@ -1,3 +1,5 @@
+#define FORCE_DEBUG
+
 #include <string>
 #include "base/CommandLineParser.h"
 #include "base/FileParser.h"
@@ -52,6 +54,8 @@ public:
     }
     //cout << "Fold=" << fold << " Index= " << i << endl;
     //cout << "cdf=" << m_cdf[i] << endl;
+    if (i >= m_cdf.isize())
+      i = m_cdf.isize()-1;
     return m_cdf[i];
   }
 
