@@ -126,7 +126,7 @@ public:
     double sum = 0.;
     double div = 0.;
     for (i=0; i<a.isize(); i++) {
-      if (a[i] < 0.001 || avg[i] < 0.001)
+      if (/*a[i] < 0.001 ||*/ avg[i] < 0.001)
 	continue;
       sum += a[i]/avg[i];
       div += 1.;
@@ -358,7 +358,10 @@ int main( int argc, char** argv )
       //cerr << "OUCH!" << endl;
     } else {
       a[i] = 0.;
-      b[i] = l[i];
+      if (l[i] > 0.)
+	b[i] = 1./l[i];
+      else
+	b[i] = 1;
       c[i] = 0.;
       cerr << "Using linear model a=" << a[i] << " b=" << b[i] << " c=" << c[i] << endl;
       //FILE * p = fopen("factors.out", "a");
@@ -384,7 +387,7 @@ int main( int argc, char** argv )
       double d = parser.AsFloat(i)+1.;
    
       double val;
-      if (d > bound) {
+      if (d >= bound) {
 	double x, y;
 	y = log(d);
  
@@ -392,7 +395,7 @@ int main( int argc, char** argv )
 	x = a[i-first]+b[i-first]*y+c[i-first]*y*y;
 	val = exp(x)-1;
 	
-     } else {
+      } else {
 	// Backoff to linear
 	double bb = log(bound);
 	double vv = a[i-first]+b[i-first]*bb+c[i-first]*bb*bb;
