@@ -108,11 +108,14 @@ int main( int argc, char** argv )
     cmmd += " -r ";
     cmmd += rew;
   }
-  cmmd += " -t ";
-  cmmd += thresh;
+
+  if (thresh != "") {
+    cmmd += " -t ";
+    cmmd += thresh;
+  }
 
   cmmd += " > hmm_out";
-  Run(exec_dir, cmmd);
+  //Run(exec_dir, cmmd);
 
   //=============================================
   cmmd = "RefGenePolyReg -w hmm_out -i ";

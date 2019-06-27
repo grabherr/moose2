@@ -124,14 +124,20 @@ public:
   double Value(const svec<double> & a, const svec<double> & avg) {
     int i;
     double sum = 0.;
-    double div = 0.;
+    double div = 0.001;
     for (i=0; i<a.isize(); i++) {
-      if (/*a[i] < 0.001 ||*/ avg[i] < 0.001)
+      if (a[i] < 0.001 || avg[i] < 0.001)
 	continue;
       sum += a[i]/avg[i];
       div += 1.;
     }
-    return sum/div;
+    double v = sum/div;
+    double lim = 2.1; 
+    if (v > lim)
+      v = lim;
+    if (v < 1/lim)
+      v = 1/lim;
+    return v;
   }
 
 };
