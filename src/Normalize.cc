@@ -115,7 +115,7 @@ int main( int argc, char** argv )
   }
 
   cmmd += " > hmm_out";
-  //Run(exec_dir, cmmd);
+  Run(exec_dir, cmmd);
 
   //=============================================
   cmmd = "RefGenePolyReg -w hmm_out -i ";
